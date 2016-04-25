@@ -17,6 +17,8 @@ class ProxyMiddleware(object):
         self.password = self.settings['password']
 
         self.proxies = read_proxies(self.settings['proxies_file'])
+        self.remove_proxy_for_status_codes = \
+            self.settings['remove_proxy_for_status_codes']
 
 
     @classmethod

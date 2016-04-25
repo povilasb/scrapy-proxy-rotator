@@ -27,6 +27,7 @@ def test_contructor_reads_proxies_from_file_specified_in_settings(
         'username': 'dummy',
         'password': 'dummy',
         'proxies_file': '/tmp/proxies.txt',
+        'remove_proxy_for_status_codes': [],
     }}
 
     middleware = ProxyMiddleware(settings)
