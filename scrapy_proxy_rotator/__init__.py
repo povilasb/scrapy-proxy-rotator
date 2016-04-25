@@ -74,7 +74,19 @@ class ProxyMiddleware(object):
         Returns:
             str: random proxy address.
         """
-        return random.choice(self.proxies)
+        return random.choice(self.working_proxies())
+
+
+    def working_proxies(self):
+        """Filters only working proxies.
+
+        Returns:
+            [str]: proxy list with removed blacklisted proxies.
+        """
+        return filter(
+            lambda proxy: proxy not in self.blacklisted_proxies,
+            self.proxies
+        )
 
 
     def should_remove_proxy(self, response):

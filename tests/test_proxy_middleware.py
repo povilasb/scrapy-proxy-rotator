@@ -63,6 +63,7 @@ def test_set_proxy_sets_authorization_header_in_request_meta_info(
     auth_header_mock.return_value = 'Basic abc123=='
 
     middleware = ProxyMiddleware(MagicMock())
+    middleware.random_proxy = MagicMock()
     request = MagicMock()
 
     middleware.set_proxy(request)
@@ -99,3 +100,13 @@ def test_process_response_blacklists_proxy_if_response_status_code_is_within_not
     middleware.process_response(request, response, 'dummy')
 
     assert_that(middleware.blacklisted_proxies, is_(['http://1.2.3.4:8080']))
+
+
+@patch('scrapy_proxy_rotator.read_proxies')
+def test_working_proxies_returns_proxy_list_with_removed_blacklisted_proxies(
+        read_proxies_mock):
+    middleware = ProxyMiddleware(MagicMock())
+    middleware.proxies = ['1.2.3.4', '1.2.3.5', '1.2.3.6']
+    middleware.blacklisted_proxies = ['1.2.3.5']
+
+    assert_that(middleware.working_proxies(), is_(['1.2.3.4', '1.2.3.6']))
