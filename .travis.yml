@@ -1,0 +1,10 @@
+language: python
+
+python:
+  - "2.7"
+
+script:
+  - make test
+
+after_success:
+  COVERALLS_REPO_TOKEN=sPLJ12mFaYCZX6oardfe8pI5bgieaeSOt coveralls
