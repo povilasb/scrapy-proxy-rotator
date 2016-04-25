@@ -2,6 +2,8 @@
 About
 =====
 
+.. image:: https://travis-ci.org/povilasb/scrapy-proxy-rotator.svg?branch=master
+
 This is a `Scrapy <http://scrapy.org/>`_ downloader middleware that sets proxy
 server for requests.
 Currently proxy servers are rotated randomly.
