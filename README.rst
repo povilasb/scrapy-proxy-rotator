@@ -3,6 +3,7 @@ About
 =====
 
 .. image:: https://travis-ci.org/povilasb/scrapy-proxy-rotator.svg?branch=master
+.. image:: https://coveralls.io/repos/github/povilasb/scrapy-proxy-rotator/badge.svg?branch=master :target: https://coveralls.io/github/povilasb/scrapy-proxy-rotator?branch=master
 
 This is a `Scrapy <http://scrapy.org/>`_ downloader middleware that sets proxy
 server for requests.
