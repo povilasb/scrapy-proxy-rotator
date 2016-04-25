@@ -69,3 +69,33 @@ def test_set_proxy_sets_authorization_header_in_request_meta_info(
 
     request.headers.__setitem__.assert_called_with(
         'Proxy-Authorization', 'Basic abc123==')
+
+
+@patch('scrapy_proxy_rotator.read_proxies')
+def test_should_remove_proxy_returns_true_when_response_status_code_is_within_not_allowed_ones(
+        read_proxies_mock):
+    middleware = ProxyMiddleware(MagicMock())
+    middleware.remove_proxy_for_status_codes = [504]
+
+    response = MagicMock()
+    response.status = 504
+
+    remove_proxy = middleware.should_remove_proxy(response)
+
+    assert_that(remove_proxy, is_(True))
+
+
+@patch('scrapy_proxy_rotator.read_proxies')
+def test_process_response_blacklists_proxy_if_response_status_code_is_within_not_allowed_codes_list(
+        read_proxies_mock):
+    middleware = ProxyMiddleware(MagicMock())
+    middleware.should_remove_proxy = MagicMock()
+    middleware.should_remove_proxy.return_value = True
+
+    response = MagicMock()
+    request = MagicMock()
+    request.meta.__getitem__.return_value = 'http://1.2.3.4:8080'
+
+    middleware.process_response(request, response, 'dummy')
+
+    assert_that(middleware.blacklisted_proxies, is_(['http://1.2.3.4:8080']))
