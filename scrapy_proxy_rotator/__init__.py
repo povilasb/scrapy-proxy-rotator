@@ -18,6 +18,10 @@ class ProxyMiddleware(object):
 
         self.proxies = read_proxies(self.settings['proxies_file'])
 
+        self.remove_proxy_for_status_codes = \
+            self.settings['remove_proxy_for_status_codes']
+        self.blacklisted_proxies = []
+
 
     @classmethod
     def from_settings(cls, settings):
@@ -41,6 +45,19 @@ class ProxyMiddleware(object):
         self.set_proxy(request)
 
 
+    def process_response(self, request, response, spider):
+        """Called for every response.
+
+        Args:
+            request (scrapy.Request)
+            response (scrapy.Response)
+        """
+        if self.should_remove_proxy(response):
+            self.blacklisted_proxies.append(request.meta['proxy'])
+
+        return response
+
+
     def set_proxy(self, request):
         """Sets proxy server for request.
 
@@ -57,7 +74,32 @@ class ProxyMiddleware(object):
         Returns:
             str: random proxy address.
         """
-        return random.choice(self.proxies)
+        return random.choice(self.working_proxies())
+
+
+    def working_proxies(self):
+        """Filters only working proxies.
+
+        Returns:
+            [str]: proxy list with removed blacklisted proxies.
+        """
+        return filter(
+            lambda proxy: proxy not in self.blacklisted_proxies,
+            self.proxies
+        )
+
+
+    def should_remove_proxy(self, response):
+        """
+        Args:
+            response (scrapy.Response): response object used to get status
+                code.
+
+        Returns:
+            bool: True if proxy server should be blacklisted, meaning
+                it will not be used for future requests.
+        """
+        return response.status in self.remove_proxy_for_status_codes
 
 
 def proxy_auth_header(user, password):
